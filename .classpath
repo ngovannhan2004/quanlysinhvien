@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-19">
+		<attributes>
+			<attribute name="module" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="src/jdbc/mssql-jdbc-11.2.1.jre11.jar"/>
+	<classpathentry kind="lib" path="src/jdbc/mssql-jdbc-11.2.1.jre17.jar"/>
+	<classpathentry kind="lib" path="src/jdbc/mssql-jdbc-11.2.1.jre18.jar"/>
+	<classpathentry kind="lib" path="src/jdbc/mssql-jdbc-11.2.1.jre8.jar"/>
+	<classpathentry kind="lib" path="src/jdbc/sqljdbc42.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Nhan/Downloads/rs2xml (1).jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
