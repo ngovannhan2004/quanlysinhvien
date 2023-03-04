@@ -133,7 +133,7 @@ public class Login extends JFrame {
 					thongBaoTinNhan(thongBao);
 					if (thongBao.getKiemTra() == true) {
 						dispose();
-						new MenuDashBoards();
+						new Menu();
 					}
 				}
 

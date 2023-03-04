@@ -10,15 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,16 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import daos.LopHocDao;
 import daos.NganhDao;
 import daos.ThongBao;
-import jdbc.DBConnect;
-import models.Khoa;
 import models.Lop;
 import models.Nganh;
-import models.Truong;
 
 public class QuanLyLop extends JFrame {
 
@@ -46,10 +39,11 @@ public class QuanLyLop extends JFrame {
 	private DefaultTableModel defaultTableModel;
 	private LopHocDao lopHocDao = new LopHocDao();
 	private NganhDao nganhDao = new NganhDao();
-	private JComboBox<Nganh> jComboBox = new JComboBox<Nganh>();
+	private JComboBox<Nganh> nganhComboBox = new JComboBox<Nganh>();
 	private JTable table = new JTable();
 	private Vector<Lop> lops;
 	private Vector<Nganh> nganhs = new Vector<>();
+	private DefaultComboBoxModel<Nganh> nganhModel;
 
 	public QuanLyLop() throws HeadlessException {
 
@@ -58,7 +52,7 @@ public class QuanLyLop extends JFrame {
 
 	public void initUI() {
 		layDuLieu();
-		this.setSize(800, 340);
+		this.setSize(1000, 340);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -95,8 +89,8 @@ public class QuanLyLop extends JFrame {
 		paneTextField.setSize(300, 100);
 		paneTextField.add(tfId);
 		paneTextField.add(tfName);
-		paneTextField.add(jComboBox);
-
+		paneTextField.add(nganhComboBox);
+		nganhComboBox.setModel(nganhModel);
 		/// right
 		JPanel jPanelw = new JPanel();
 		JPanel panelContent = new JPanel(new GridLayout());
@@ -111,18 +105,18 @@ public class QuanLyLop extends JFrame {
 		/// action
 		JPanel panelBottom = new JPanel(new GridLayout(2, 1));
 		JPanel panelAction = new JPanel();
-		JButtonCustom JButtonCustomAdd = new JButtonCustom("Add");
-		JButtonCustom JButtonCustomDelete = new JButtonCustom("Delete");
-		JButtonCustom JButtonCustomFind = new JButtonCustom("Find");
-		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Update");
-		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Refresh");
-		JButtonCustom sort = new JButtonCustom("Sort By Name");
-		JButtonCustom buttonBack = new JButtonCustom("Back");
+		JButtonCustom JButtonCustomAdd = new JButtonCustom("Thêm");
+		JButtonCustom JButtonCustomDelete = new JButtonCustom("Xóa");
+		JButtonCustom JButtonCustomFind = new JButtonCustom("Tìm Kiếm");
+		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Sửa");
+		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Làm Mới");
+		JButtonCustom sort = new JButtonCustom("Sắp Xếp");
+		JButtonCustom buttonBack = new JButtonCustom("Thoát");
 		buttonBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new MenuDashBoards();
+				new Menu();
 			}
 		});
 		JButtonCustomAdd.addActionListener(new ActionListener() {
@@ -131,7 +125,7 @@ public class QuanLyLop extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				lop.setTenlop(tfName.getText());
-				Nganh nganh = (Nganh) jComboBox.getSelectedItem();
+				Nganh nganh = (Nganh) nganhComboBox.getSelectedItem();
 				lop.setNganh(nganh);
 				if (tienXuLyDuLieu(lop)) {
 					try {
@@ -184,7 +178,7 @@ public class QuanLyLop extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				lop.setTenlop(tfName.getText());
-				lop.setNganh((Nganh) jComboBox.getSelectedItem());
+				lop.setNganh((Nganh) nganhComboBox.getSelectedItem());
 				if (tienXuLyDuLieu(lop)) {
 					try {
 						ThongBao thongBao = lopHocDao.update(lop.getId(), lop);
@@ -231,17 +225,14 @@ public class QuanLyLop extends JFrame {
 
 				int row = table.getSelectedRow();
 				String id = (table.getModel().getValueAt(row, 0)).toString();
-				TableModel tableModel = table.getModel();
-				ComboBoxModel<Nganh> comboBoxModel = jComboBox.getModel();
-				int idNganh = (int) tableModel.getValueAt(row, 2);
-				Nganh nganh = timKiemNganhById(idNganh);
-				comboBoxModel.setSelectedItem(nganh);
-				jComboBox.setModel(comboBoxModel);
+
 				try {
+
 					Lop lop = lopHocDao.findOne(Integer.parseInt(id));
 					tfId.setText(lop.getId() + "");
 					tfName.setText(lop.getTenlop());
-
+					nganhModel.setSelectedItem(lop.getNganh());
+					nganhComboBox.setModel(nganhModel);
 				} catch (Exception e2) {
 					e2.printStackTrace();
 					// TODO: handle exception
@@ -290,11 +281,11 @@ public class QuanLyLop extends JFrame {
 	}
 
 	public void layDuLieu(Vector<Lop> lops) {
-		String[] columns = { "id", "TenLop", "idnganh" };
+		String[] columns = { "id", "Tên Lớp", "Ngành" };
 		defaultTableModel = new DefaultTableModel(columns, 0);
-
+		nganhModel = new DefaultComboBoxModel<>(nganhs);
 		for (Lop lop : lops) {
-			Object[] row = { lop.getId(), lop.getTenlop(), lop.getNganh().getId() };
+			Object[] row = { lop.getId(), lop.getTenlop(), lop.getNganh().getTenNganh() };
 			defaultTableModel.addRow(row);
 		}
 		table.setModel(defaultTableModel);
@@ -304,7 +295,6 @@ public class QuanLyLop extends JFrame {
 
 		try {
 			nganhs = lopHocDao.getAllNganh();
-			jComboBox = new JComboBox<Nganh>(nganhs);
 			lops = lopHocDao.findAll();
 
 			layDuLieu(lops);
@@ -313,15 +303,6 @@ public class QuanLyLop extends JFrame {
 			e.printStackTrace();
 		}
 
-	}
-
-	public Nganh timKiemNganhById(int id) {
-
-		for (Nganh nganh : nganhs) {
-			if (nganh.getId() == id)
-				return nganh;
-		}
-		return null;
 	}
 
 	public void thongBao(String string) {

@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.mail.MessagingException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,10 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import daos.KhoiPhucMatKhauDao;
-import daos.NguoiDungDao;
 import daos.ThongBao;
 import models.KhoiPhucMatKhau;
-import models.NguoiDung;
 import models.ThongBaoData;
 import utils.MailUtil;
 import utils.SendEmail;
@@ -32,6 +29,7 @@ public class GetCodeForgotPass extends JFrame {
 	private JTextField textFieldMK;
 	private MailUtil mailUtil = new MailUtil();
 	private KhoiPhucMatKhauDao khoiPhucMatKhauDao = new KhoiPhucMatKhauDao();
+
 	public GetCodeForgotPass() {
 		initUI();
 	}
@@ -104,8 +102,7 @@ public class GetCodeForgotPass extends JFrame {
 			JOptionPane.showMessageDialog(null, thongBao.getTinNhan());
 		} else {
 			// send Mail
-			SendEmail sendEmail = new SendEmail(textFieldMK.getText(), "", thongBao.getData().getCode(),
-					"Xin Chào");
+			SendEmail sendEmail = new SendEmail(textFieldMK.getText(), "", thongBao.getData().getCode(), "Xin Chào");
 			sendEmail.start();
 			Timer timer = new Timer();
 			JOptionPane.showMessageDialog(null, "Mã của bạn đã được gửi về email của bạn");
@@ -120,6 +117,7 @@ public class GetCodeForgotPass extends JFrame {
 		}
 
 	}
+
 	public static void main(String[] args) {
 		new GetCodeForgotPass();
 	}

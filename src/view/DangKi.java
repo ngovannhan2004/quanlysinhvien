@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import daos.NguoiDungDao;
 import daos.ThongBao;
 import models.NguoiDung;
+import utils.Validate;
 
 class JTextFieldCustom extends JTextField {
 
@@ -144,12 +145,12 @@ public class DangKi extends JFrame {
 				nguoiDung.setEmail(textFieldEmail.getText());
 				nguoiDung.setMatkhau(passwordField.getText());
 				nguoiDung.setTen(textFieldten.getText());
-				if(tienXuLyDuLieu(nguoiDung)) {
+				if (tienXuLyDuLieu(nguoiDung)) {
 					ThongBao thongBao = nguoiDungDao.dangki(nguoiDung);
 					thongBaoTinNhan(thongBao);
 
 				}
-				
+
 			}
 		});
 	}
@@ -161,6 +162,7 @@ public class DangKi extends JFrame {
 		JOptionPane.showMessageDialog(null, thongBao.getTinNhan());
 
 	}
+
 	public void thongBao(String string) {
 		JOptionPane.showMessageDialog(null, string);
 	}
@@ -182,10 +184,12 @@ public class DangKi extends JFrame {
 			thongBao("Chưa nhập tên người dùng");
 			return false;
 		}
-
+		if (!Validate.isEmailValid(nguoiDung.getEmail())) {
+			thongBao("Email không hợp lệ");
+			return false;
+		}
 		return true;
 	}
-
 
 	public static void main(String[] args) {
 		new DangKi();

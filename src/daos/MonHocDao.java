@@ -15,7 +15,7 @@ import models.Truong;
 
 public class MonHocDao implements DaoInterface<MonHoc> {
 	public String tableName = "MonHoc";
-	public String queryCreate = "INSERT INTO " + tableName + " (tenmonhoc,idsinhvien)VALUES(?,?)";
+	public String queryCreate = "INSERT INTO " + tableName + " (tenmonhoc,idsinhVien)VALUES(?,?)";
 	public String queryUpdate = "UPDATE " + tableName + " SET tenmonhoc = ?" + ", idsinhvien=? WHERE id = ?";
 	public String queryXoa = "DELETE FROM " + tableName + " WHERE `id` = ?";
 	public String queryFindOne = "SELECT * FROM " + tableName + " WHERE `id` = ?";
@@ -37,24 +37,33 @@ public class MonHocDao implements DaoInterface<MonHoc> {
 			stm.setInt(2, duLieu.getSinhVien().getId());
 			stm.executeUpdate();
 			return new ThongBao("Thêm Thành công ", true);
-
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
+			return new ThongBao("Thêm Không Thành công ", false);
 		}
-		return null;
+		
 
 	}
 
 	@Override
 	public ThongBao update(int id, MonHoc duLieu) throws Exception {
 		// TODO Auto-generated method stub
-		PreparedStatement stm = connection.prepareStatement(queryUpdate);
-		stm.setInt(1, id);
-		stm.setString(2, duLieu.getTenMonHoc());
-		stm.setInt(3, duLieu.getSinhVien().getId());
-		stm.executeUpdate();
-		return new ThongBao("Câp Nhật Thành Công  ", true);
+		try {
+			PreparedStatement stm = connection.prepareStatement(queryUpdate);
+			
+			stm.setString(1, duLieu.getTenMonHoc());
+			stm.setInt(2, duLieu.getSinhVien().getId());
+			stm.setInt(3, id);
+			stm.executeUpdate();
+			return new ThongBao("Câp Nhật Thành Công  ", true);
 
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ThongBao("Câp Nhật Không Thành Công  ", false);
+		}
+		
 	}
 
 	@Override
@@ -79,7 +88,7 @@ public class MonHocDao implements DaoInterface<MonHoc> {
 		stm.setInt(1, id);
 		ResultSet rs = stm.executeQuery();
 		if (rs.next()) {
-			SinhVien sinhVien = sinhVienDao.findOne(rs.getInt("idSV"));
+			SinhVien sinhVien = sinhVienDao.findOne(rs.getInt("idsinhVien"));
 			return new MonHoc(rs.getInt(1), rs.getString(2), sinhVien);
 		}
 		return null;
@@ -92,7 +101,7 @@ public class MonHocDao implements DaoInterface<MonHoc> {
 		PreparedStatement stm = connection.prepareStatement(queryFindAll);
 		ResultSet rs = stm.executeQuery();
 		while (rs.next()) {
-			SinhVien sinhVien = sinhVienDao.findOne(rs.getInt("idSV"));
+			SinhVien sinhVien = sinhVienDao.findOne(rs.getInt("idsinhVien"));
 			monhocs.add(new MonHoc(rs.getInt(1), rs.getString(2), sinhVien));
 		}
 		return monhocs;

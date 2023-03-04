@@ -14,6 +14,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 class JButtonCustom extends JButton {
 
@@ -31,27 +33,27 @@ class JButtonCustom extends JButton {
 
 }
 
-public class MenuDashBoards extends JFrame {
+public class Menu extends JFrame {
 	JButton jButtonQLT;
 	JButton jButtonQLK;
 	JButton jButtonQLN;
 	JButton jButtonQLL;
 	JButton jButtonQLSV;
 	JButton jButtonQLMH;
-	String id;
+	JButton buttonTK;
 	JButton buttonBack;
 
 	public void MenuDashBoards() {
 
 	}
 
-	public MenuDashBoards() {
+	public Menu() {
 		initUI();
 	}
 
 	private void initUI() {
 
-		this.setSize(500, 300);
+		this.setSize(550, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -66,7 +68,7 @@ public class MenuDashBoards extends JFrame {
 		lableTittle.setFont(fontT);
 		lableTittle.setForeground(Color.red);
 		panelContainer.add(panelTitle, BorderLayout.NORTH);
-		JPanel panelBottom = new JPanel(new GridLayout(2, 3, 10, 10));
+		JPanel panelBottom = new JPanel(new GridLayout(3, 2, 10, 10));
 
 		JPanel panelBack = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 		jButtonQLT = new JButtonCustom("Quản Lý Trường");
@@ -75,7 +77,8 @@ public class MenuDashBoards extends JFrame {
 		jButtonQLL = new JButtonCustom("Quản Lý Lớp");
 		jButtonQLSV = new JButtonCustom("Quản Lý Sinh Viên");
 		jButtonQLMH = new JButtonCustom("Quản Lý Môn Học");
-		buttonBack = new JButton("THOÁT");
+		buttonTK = new JButtonCustom("Thống Kê");
+		buttonBack = new JButton("Đăng Xuất");
 		buttonBack.setBackground(new Color(255, 255, 255));
 		buttonBack.setForeground(Color.BLACK);
 		buttonBack.setBorderPainted(false);
@@ -100,14 +103,12 @@ public class MenuDashBoards extends JFrame {
 		panelBottom.add(jButtonQLL);
 		panelBottom.add(jButtonQLSV);
 		panelBottom.add(jButtonQLMH);
+		panelBottom.add(buttonTK);
 		panelContainer.add(panelBottom, BorderLayout.CENTER);
 		panelContainer.add(panelBack, BorderLayout.SOUTH);
 		this.add(panelContainer);
 		this.setVisible(true);
-		addevent();
-	}
 
-	public void addevent() {
 		jButtonQLT.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -151,10 +152,18 @@ public class MenuDashBoards extends JFrame {
 				new QuanLyMonHoc();
 			}
 		});
+		buttonTK.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				new chatr();
+			}
+		});
 	}
 
 	public static void main(String[] args) {
-		new MenuDashBoards();
+		new Menu();
 	}
 
 }

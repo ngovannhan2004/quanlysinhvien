@@ -10,16 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,15 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import daos.KhoaDao;
 import daos.NganhDao;
 import daos.ThongBao;
-import jdbc.DBConnect;
 import models.Khoa;
 import models.Nganh;
-import models.Truong;
 
 public class QuanLyNganh extends JFrame {
 
@@ -48,8 +41,9 @@ public class QuanLyNganh extends JFrame {
 	private NganhDao nganhDao = new NganhDao();
 	Vector<Nganh> nganhs;
 	private Vector<Khoa> khoas = new Vector<>();
-	private JComboBox<Khoa> jComboBox = new JComboBox<Khoa>();
+	private JComboBox<Khoa> khoaComboBox = new JComboBox<Khoa>();
 	private JTable table = new JTable();
+	private DefaultComboBoxModel<Khoa> khoaModel;
 
 	public QuanLyNganh() throws HeadlessException {
 
@@ -58,10 +52,10 @@ public class QuanLyNganh extends JFrame {
 
 	public void initUI() {
 		layDuLieu();
-		this.setSize(650, 350);
-		this.setResizable(false);
+		this.setSize(1000, 340);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
+		this.setResizable(false);
 		JPanel panelContainer = new JPanel(new BorderLayout());
 		Font fontT = new Font("Tahoma", Font.BOLD, 20);
 
@@ -79,24 +73,23 @@ public class QuanLyNganh extends JFrame {
 		Font fontTt = new Font("Tahoma", Font.BOLD, 16);
 		JLabel jlabelId = new JLabel(" id ");
 		jlabelId.setFont(fontTt);
-		JLabel jlabelname = new JLabel(" Tên Ngành ");
+		JLabel jlabelname = new JLabel(" Tên ngành ");
 		jlabelname.setFont(fontTt);
-		JLabel jlabelidNganh = new JLabel(" id Khoa ");
-		jlabelidNganh.setFont(fontTt);
+		JLabel jlabelidnganh = new JLabel("Khoa ");
+		jlabelidnganh.setFont(fontTt);
 
 		JTextFieldCustom tfId = new JTextFieldCustom();
 		JTextFieldCustom tfName = new JTextFieldCustom();
 
 		jpanelLeftContent.add(jlabelId);
 		jpanelLeftContent.add(jlabelname);
-		jpanelLeftContent.add(jlabelidNganh);
+		jpanelLeftContent.add(jlabelidnganh);
 
-		JPanel paneTextField = new JPanel(new GridLayout(3, 1, 15, 35));
-		paneTextField.setSize(300, 100);
+		JPanel paneTextField = new JPanel(new GridLayout(3, 1, 20, 35));
 		paneTextField.add(tfId);
 		paneTextField.add(tfName);
-
-		paneTextField.add(jComboBox);
+		paneTextField.add(khoaComboBox);
+		khoaComboBox.setModel(khoaModel);
 
 		/// right
 		JPanel jPanelw = new JPanel();
@@ -112,18 +105,18 @@ public class QuanLyNganh extends JFrame {
 		/// action
 		JPanel panelBottom = new JPanel(new GridLayout(2, 1));
 		JPanel panelAction = new JPanel();
-		JButtonCustom JButtonCustomAdd = new JButtonCustom("Add");
-		JButtonCustom JButtonCustomDelete = new JButtonCustom("Delete");
-		JButtonCustom JButtonCustomFind = new JButtonCustom("Find");
-		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Update");
-		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Refresh");
-		JButtonCustom sort = new JButtonCustom("Sort By Name");
-		JButtonCustom buttonBack = new JButtonCustom("Back");
+		JButtonCustom JButtonCustomAdd = new JButtonCustom("Thêm");
+		JButtonCustom JButtonCustomDelete = new JButtonCustom("Xóa");
+		JButtonCustom JButtonCustomFind = new JButtonCustom("Tìm Kiếm");
+		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Sửa");
+		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Làm Mới");
+		JButtonCustom sort = new JButtonCustom("Sắp Xếp");
+		JButtonCustom buttonBack = new JButtonCustom("Thoát");
 		buttonBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new MenuDashBoards();
+				new Menu();
 			}
 		});
 		JButtonCustomAdd.addActionListener(new ActionListener() {
@@ -132,7 +125,7 @@ public class QuanLyNganh extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				nganh.setTenNganh(tfName.getText());
-				Khoa khoa = (Khoa) jComboBox.getSelectedItem();
+				Khoa khoa = (Khoa) khoaComboBox.getSelectedItem();
 				nganh.setKhoa(khoa);
 				if (tienXuLyDuLieu(nganh)) {
 					try {
@@ -160,7 +153,7 @@ public class QuanLyNganh extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				String[] columns = { "id", "Tên Ngành", "id khoa" };
+				String[] columns = { "id", "Tên Ngành", "id khoa " };
 				defaultTableModel = new DefaultTableModel(columns, 0);
 				nganh = new Nganh();
 				try {
@@ -191,7 +184,7 @@ public class QuanLyNganh extends JFrame {
 				Nganh nganh = new Nganh();
 				nganh.setId(Integer.parseInt(tfId.getText()));
 				nganh.setTenNganh(tfName.getText());
-				nganh.setKhoa((Khoa) jComboBox.getSelectedItem());
+				nganh.setKhoa((Khoa) khoaModel.getSelectedItem());
 				if (tienXuLyDuLieu(nganh)) {
 					try {
 						ThongBao thongBao = nganhDao.update(nganh.getId(), nganh);
@@ -238,16 +231,12 @@ public class QuanLyNganh extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				int row = table.getSelectedRow();
 				String id = (table.getModel().getValueAt(row, 0)).toString();
-				TableModel tableModel = table.getModel();
-				ComboBoxModel<Khoa> comboBoxModel = jComboBox.getModel();
-				int idKhoa = (int) tableModel.getValueAt(row, 2);
-				Khoa khoa = timKiemKhoaById(idKhoa);
-				comboBoxModel.setSelectedItem(khoa);
-				jComboBox.setModel(comboBoxModel);
 				try {
 					Nganh nganh = nganhDao.findOne(Integer.parseInt(id));
 					tfId.setText(nganh.getId() + "");
 					tfName.setText(nganh.getTenNganh());
+					khoaModel.setSelectedItem(nganh.getKhoa());
+					khoaComboBox.setModel(khoaModel);
 
 				} catch (Exception e2) {
 					e2.printStackTrace();
@@ -255,9 +244,12 @@ public class QuanLyNganh extends JFrame {
 				}
 			}
 		});
+
+//
 		JPanel jPanelSearch = new JPanel(new FlowLayout());
 		jPanelSearch.add(sort);
 		jPanelSearch.add(buttonBack);
+
 		panelAction.add(JButtonCustomAdd);
 		panelAction.add(JButtonCustomDelete);
 		panelAction.add(JButtonCustomFind);
@@ -266,6 +258,7 @@ public class QuanLyNganh extends JFrame {
 		panelAction.add(JButtonCustomUpdate);
 		panelBottom.add(jPanelSearch);
 		panelBottom.add(panelAction);
+
 //
 		jPanelW.add(jpanelLeftContent);
 		jPanelW.add(paneTextField);
@@ -294,11 +287,11 @@ public class QuanLyNganh extends JFrame {
 	}
 
 	public void layDuLieu(Vector<Nganh> nganhs) {
-		String[] columns = { "id", "Tên Ngành", "id khoa" };
+		String[] columns = { "id", "Tên Ngành", "Tên Khoa" };
 		defaultTableModel = new DefaultTableModel(columns, 0);
-		jComboBox = new JComboBox<Khoa>(khoas);
+		khoaModel = new DefaultComboBoxModel<>(khoas);
 		for (Nganh nganh : nganhs) {
-			Object[] row = { nganh.getId(), nganh.getTenNganh(), nganh.getKhoa().getId() };
+			Object[] row = { nganh.getId(), nganh.getTenNganh(), nganh.getKhoa().getTenkhoa() };
 			defaultTableModel.addRow(row);
 		}
 		table.setModel(defaultTableModel);
@@ -315,14 +308,6 @@ public class QuanLyNganh extends JFrame {
 			e.printStackTrace();
 		}
 
-	}
-
-	public Khoa timKiemKhoaById(int id) {
-		for (Khoa khoa : khoas) {
-			if (khoa.getId() == id)
-				return khoa;
-		}
-		return null;
 	}
 
 	public void thongBao(String string) {

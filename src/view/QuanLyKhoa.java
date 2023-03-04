@@ -16,7 +16,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
-
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -39,9 +39,10 @@ public class QuanLyKhoa extends JFrame {
 	private DefaultTableModel defaultTableModel;
 	private KhoaDao khoaDao = new KhoaDao();
 	private TruongDao truongDao = new TruongDao();
-	private JComboBox<Truong> jComboBox = new JComboBox<Truong>();
+	private JComboBox<Truong> truongComboBox = new JComboBox<Truong>();
 	Vector<Truong> truongs = new Vector<>();
 	private JTable table = new JTable();
+	private DefaultComboBoxModel<Truong> truongModel;
 
 	public QuanLyKhoa() throws HeadlessException {
 		initUI();
@@ -93,7 +94,9 @@ public class QuanLyKhoa extends JFrame {
 		paneTextField.add(tfId);
 		paneTextField.add(tfName);
 		paneTextField.add(tfPhone);
-		paneTextField.add(jComboBox);
+		paneTextField.add(truongComboBox);
+		truongComboBox.setModel(truongModel);
+
 		/// right
 		JPanel jPanelw = new JPanel();
 		JPanel panelContent = new JPanel(new GridLayout());
@@ -108,13 +111,13 @@ public class QuanLyKhoa extends JFrame {
 		/// action
 		JPanel panelBottom = new JPanel(new GridLayout(2, 1));
 		JPanel panelAction = new JPanel();
-		JButtonCustom JButtonCustomAdd = new JButtonCustom("Add");
-		JButtonCustom JButtonCustomDelete = new JButtonCustom("Delete");
-		JButtonCustom JButtonCustomFind = new JButtonCustom("Find");
-		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Update");
-		JButtonCustom sort = new JButtonCustom("Sort By Name");
-		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Refresh");
-		JButtonCustom buttonBack = new JButtonCustom("Back");
+		JButtonCustom JButtonCustomAdd = new JButtonCustom("Thêm");
+		JButtonCustom JButtonCustomDelete = new JButtonCustom("Xóa");
+		JButtonCustom JButtonCustomFind = new JButtonCustom("Tìm Kiếm");
+		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Sửa");
+		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Làm Mới");
+		JButtonCustom sort = new JButtonCustom("Sắp Xếp");
+		JButtonCustom buttonBack = new JButtonCustom("Thoát");
 		JPanel jPanelSearch = new JPanel(new FlowLayout());
 		jPanelSearch.add(sort);
 		jPanelSearch.add(buttonBack);
@@ -129,7 +132,7 @@ public class QuanLyKhoa extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new MenuDashBoards();
+				new Menu();
 			}
 		});
 		JButtonCustomAdd.addActionListener(new ActionListener() {
@@ -138,11 +141,16 @@ public class QuanLyKhoa extends JFrame {
 				Khoa khoa = new Khoa();
 				khoa.setTenkhoa(tfName.getText());
 				khoa.setDienThoai(tfPhone.getText());
-				Truong truong = (Truong) jComboBox.getSelectedItem();
+				Truong truong = (Truong) truongComboBox.getSelectedItem();
 				khoa.setTruong(truong);
 				if (tienXuLyDuLieu(khoa)) {
-					ThongBao thongBao = khoaDao.create(khoa);
-					thongBaoTinNhan(thongBao);
+					try {
+						ThongBao thongBao = khoaDao.create(khoa);
+						thongBaoTinNhan(thongBao);
+					} catch (Exception e2) {
+						// TODO: handle exception
+					}
+
 				}
 
 			}
@@ -186,7 +194,7 @@ public class QuanLyKhoa extends JFrame {
 				khoa.setId(Integer.parseInt(tfId.getText()));
 				khoa.setTenkhoa(tfName.getText());
 				khoa.setDienThoai(tfPhone.getText());
-				khoa.setTruong((Truong) jComboBox.getSelectedItem());
+				khoa.setTruong((Truong) truongComboBox.getSelectedItem());
 				if (tienXuLyDuLieu(khoa)) {
 					try {
 						ThongBao thongBao = khoaDao.update(khoa.getId(), khoa);
@@ -232,17 +240,13 @@ public class QuanLyKhoa extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				int row = table.getSelectedRow();
 				String id = (table.getModel().getValueAt(row, 0)).toString();
-				TableModel tableModel = table.getModel();
-				ComboBoxModel<Truong> comboBoxModel = jComboBox.getModel();
-				int idTruong = (int) tableModel.getValueAt(row, 3);
-				Truong truong = timKiemTruongById(idTruong);
-				comboBoxModel.setSelectedItem(truong);
-				jComboBox.setModel(comboBoxModel);
 				try {
 					Khoa khoa = khoaDao.findOne(Integer.parseInt(id));
 					tfId.setText(khoa.getId() + "");
 					tfName.setText(khoa.getTenkhoa());
 					tfPhone.setText(khoa.getDienThoai());
+					truongModel.setSelectedItem(khoa.getTruong());
+					truongComboBox.setModel(truongModel);
 
 				} catch (Exception e2) {
 					e2.printStackTrace();
@@ -278,10 +282,11 @@ public class QuanLyKhoa extends JFrame {
 	}
 
 	public void layDuLieu(Vector<Khoa> khoas) {
-		String[] columns = { "id", "Tên Khoa ", "Điện Thoại", "id Trường" };
+		String[] columns = { "id", "Tên Khoa ", "Điện Thoại", "Trường" };
 		defaultTableModel = new DefaultTableModel(columns, 0);
+		truongModel = new DefaultComboBoxModel<>(truongs);
 		for (Khoa khoa : khoas) {
-			Object[] row = { khoa.getId(), khoa.getTenkhoa(), khoa.getDienThoai(), khoa.getTruong().getId() };
+			Object[] row = { khoa.getId(), khoa.getTenkhoa(), khoa.getDienThoai(), khoa.getTruong().getTenTruong() };
 			defaultTableModel.addRow(row);
 		}
 		table.setModel(defaultTableModel);
@@ -291,22 +296,12 @@ public class QuanLyKhoa extends JFrame {
 		Vector<Khoa> khoas;
 		try {
 			truongs = khoaDao.getAllTruong();
-			jComboBox = new JComboBox<Truong>(truongs);
 			khoas = khoaDao.findAll();
 			layDuLieu(khoas);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public Truong timKiemTruongById(int id) {
-
-		for (Truong truong : truongs) {
-			if (truong.getId() == id)
-				return truong;
-		}
-		return null;
 	}
 
 	public void thongBao(String string) {
@@ -326,10 +321,7 @@ public class QuanLyKhoa extends JFrame {
 			thongBao("Chưa chọn Trường");
 			return false;
 		}
-		if (!Validate.isPhoneValid(khoa.getDienThoai())) {
-			thongBao("Số điện thoại không hợp lệ");
-			return false;
-		}
+
 		return true;
 	}
 

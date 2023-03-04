@@ -42,7 +42,7 @@ public class Nganh {
 
 	@Override
 	public String toString() {
-		return tenNganh + "-" + id;
+		return id + " - " + tenNganh;
 	}
 
 }

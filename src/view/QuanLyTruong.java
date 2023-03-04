@@ -51,7 +51,7 @@ public class QuanLyTruong extends JFrame {
 	public void initUI() {
 		layDuLieu();
 		this.setResizable(false);
-		this.setSize(700, 340);
+		this.setSize(700, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		JPanel panelContainer = new JPanel(new BorderLayout());
@@ -105,18 +105,18 @@ public class QuanLyTruong extends JFrame {
 		/// action
 		JPanel panelBottom = new JPanel(new GridLayout(2, 1));
 		JPanel panelAction = new JPanel();
-		JButton jButtonAdd = new JButtonCustom("Add");
-		JButton jButtonDelete = new JButtonCustom("Delete");
-		JButton jButtonFind = new JButtonCustom("Find");
-		JButton jButtonUpdate = new JButtonCustom("Update");
-		JButton jButtonRefresh = new JButtonCustom("Refresh");
-		JButton sort = new JButtonCustom("Sort By Name");
-		buttonBack = new JButtonCustom("Back");
+		JButton jButtonAdd = new JButtonCustom("Thêm");
+		JButton jButtonDelete = new JButtonCustom("Xóa");
+		JButton jButtonFind = new JButtonCustom("Tìm Kiếm");
+		JButton jButtonUpdate = new JButtonCustom("Sửa");
+		JButton jButtonRefresh = new JButtonCustom("Làm Mới");
+		JButton sort = new JButtonCustom("Sắp Xếp");
+		buttonBack = new JButtonCustom("Thoát");
 		buttonBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new MenuDashBoards();
+				new Menu();
 			}
 		});
 		JPanel jPanelSearch = new JPanel(new FlowLayout());
@@ -153,16 +153,19 @@ public class QuanLyTruong extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				Truong truong = new Truong();
 				truong.setId(Integer.parseInt(tfId.getText()));
 				truong.setTenTruong(tfName.getText());
 				truong.setDiaChi(tfDiachi.getText());
-				try {
-					ThongBao thongBao = truongDao.update(truong.getId(), truong);
-					thongBaoTinNhan(thongBao);
-					layDuLieu();
-				} catch (Exception e2) {
-					e2.printStackTrace();
-					// TODO: handle exception
+				if (tienXuLyDuLieu(truong)) {
+					try {
+						ThongBao thongBao = truongDao.update(truong.getId(), truong);
+						thongBaoTinNhan(thongBao);
+						layDuLieu();
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						// TODO: handle exception
+					}
 				}
 
 			}
@@ -189,7 +192,6 @@ public class QuanLyTruong extends JFrame {
 				String[] columns = { "id", "Tên trường", "Địa chỉ" };
 				defaultTableModel = new DefaultTableModel(columns, 0);
 				Vector<Truong> truongs;
-
 				try {
 					truong = truongDao.findOne(truong.getId());
 					Object[] row = { truong.getId(), truong.getTenTruong(), truong.getDiaChi() };

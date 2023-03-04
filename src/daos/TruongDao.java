@@ -3,20 +3,24 @@ package daos;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import jdbc.DBConnect;
+import models.Lop;
+import models.SinhVien;
 import models.Truong;
 
 public class TruongDao implements DaoInterface<Truong> {
 	public String tableName = "Truong";
 	public String queryCreate = "INSERT INTO " + tableName + "(TenTruong, DiaChi) VALUES(?,?)";
-	public String queryUpdate = "UPDATE " + tableName + " SET tentruong = ? , diachi = ? WHERE 'id'= ?";
+	public String queryUpdate = "UPDATE " + tableName + " SET TenTruong = ? , Diachi = ? WHERE `id`= ?";
 	public String queryXoa = "DELETE FROM " + tableName + " WHERE `id` = ?";
 	public String queryFindOne = "SELECT * FROM " + tableName + " WHERE `id` = ?";
 	public String queryFindAll = "SELECT * FROM " + tableName;
-	public String queryRefresh = "delete * from " + tableName;
+
 	public Connection connection = DBConnect.connection;
+
 	@Override
 	public ThongBao create(Truong duLieu) {
 		// TODO Auto-generated method stub
@@ -39,16 +43,17 @@ public class TruongDao implements DaoInterface<Truong> {
 
 		try {
 			PreparedStatement stm = connection.prepareStatement(queryUpdate);
-			stm.setInt(1, id);
-			stm.setString(2, duLieu.getTenTruong());
-			stm.setString(3, duLieu.getDiaChi());
+			stm.setString(1, duLieu.getTenTruong());
+			stm.setString(2, duLieu.getDiaChi());
+			stm.setInt(3, id);
 			stm.executeUpdate();
-			return new ThongBao("Câp Nhật Thành Công  " + duLieu, true);
+			return new ThongBao("Câp Nhật Thành Công  ", true);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+			return new ThongBao("Câp Nhật Không Thành Công  ", false);
 		}
-		return null;
+
 	}
 
 	@Override
@@ -89,8 +94,6 @@ public class TruongDao implements DaoInterface<Truong> {
 		}
 		return truongs;
 	}
-
-	  
 
 	@Override
 	public Vector<Truong> findBy(String key, String data) throws Exception {

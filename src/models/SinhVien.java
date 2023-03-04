@@ -93,7 +93,7 @@ public class SinhVien {
 
 	@Override
 	public String toString() {
-		return tensinhvien + "-" + id;
+		return id + "-" + tensinhvien;
 	}
 
 }

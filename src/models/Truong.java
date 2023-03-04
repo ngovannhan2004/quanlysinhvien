@@ -1,7 +1,5 @@
 package models;
 
-import java.util.Objects;
-
 public class Truong {
 	private int id;
 	private String tenTruong;
@@ -44,7 +42,7 @@ public class Truong {
 
 	@Override
 	public String toString() {
-		return tenTruong + "-" + id;
+		return id + "-" + tenTruong;
 	}
 
 }

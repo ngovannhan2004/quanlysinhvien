@@ -52,7 +52,7 @@ public class Khoa {
 
 	@Override
 	public String toString() {
-		return tenkhoa + "-" + id;
+		return id + " - " + tenkhoa;
 	}
 
 }

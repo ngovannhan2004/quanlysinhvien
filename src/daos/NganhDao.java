@@ -15,7 +15,7 @@ import models.Truong;
 public class NganhDao implements DaoInterface<Nganh> {
 	public String tableName = "Nganh";
 	public String queryCreate = "INSERT INTO " + tableName + "(tennganh,idkhoa) VALUES(?,?)";
-	public String queryUpdate = "UPDATE " + tableName + " SET `tennganh` = ?" + ", idtruong=? WHERE `id` = ?";
+	public String queryUpdate = "UPDATE " + tableName + " SET `tennganh` = ?" + ", idkhoa=? WHERE `id` = ?";
 	public String queryXoa = "DELETE FROM " + tableName + " WHERE `id` = ?";
 	public String queryFindOne = "SELECT * FROM " + tableName + " WHERE `id` = ?";
 	public String queryFindAll = "SELECT * FROM " + tableName;

@@ -42,7 +42,7 @@ public class Lop {
 
 	@Override
 	public String toString() {
-		return tenlop + " - " + id;
+		return id + " - " + tenlop;
 	}
 
 }

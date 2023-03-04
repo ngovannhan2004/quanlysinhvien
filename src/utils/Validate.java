@@ -20,9 +20,9 @@ public class Validate {
 	}
 
 	public boolean validateUsername(String username) {
-		
 		return username.matches(Validate.regexUsername);
 	}
+
 	public static void main(String[] args) {
 		System.out.println(Validate.isEmailValid("i"));
 	}

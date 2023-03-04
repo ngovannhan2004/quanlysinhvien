@@ -17,6 +17,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import daos.ThongBao;
 import models.Khoa;
 import models.Lop;
 import models.SinhVien;
+import models.Truong;
 import utils.Validate;
 
 public class QuanLySinhVien extends JFrame {
@@ -43,10 +45,11 @@ public class QuanLySinhVien extends JFrame {
 	private DefaultTableModel defaultTableModel;
 	private LopHocDao lopHocDao = new LopHocDao();
 	private SinhVienDao sinhVienDao = new SinhVienDao();
-	private JComboBox<Lop> jComboBox = new JComboBox<Lop>();
+	private JComboBox<Lop> lopComboBox = new JComboBox<Lop>();
 	private JTable table = new JTable();
 	Vector<SinhVien> sinhviens;
 	Vector<Lop> lops = new Vector<>();
+	private DefaultComboBoxModel<Lop> lopModel;
 	private Vector<SinhVien> sinhViens = new Vector<>();
 	JTextFieldCustom tfId;
 	JTextFieldCustom tfname;
@@ -66,7 +69,7 @@ public class QuanLySinhVien extends JFrame {
 	public void initUI() {
 
 		layDuLieu();
-		this.setSize(1000, 550);
+		this.setSize(1250, 550);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -133,7 +136,8 @@ public class QuanLySinhVien extends JFrame {
 		paneTextField.add(tfEmail);
 		paneTextField.add(tfPhone);
 		paneTextField.add(tfDiachi);
-		paneTextField.add(jComboBox);
+		paneTextField.add(lopComboBox);
+		lopComboBox.setModel(lopModel);
 		/// right
 		JPanel jPanelw = new JPanel();
 		JPanel panelContent = new JPanel(new GridLayout());
@@ -148,18 +152,18 @@ public class QuanLySinhVien extends JFrame {
 		/// action
 		JPanel panelBottom = new JPanel(new GridLayout(2, 1));
 		JPanel panelAction = new JPanel();
-		JButtonCustom JButtonCustomAdd = new JButtonCustom("Add");
-		JButtonCustom JButtonCustomDelete = new JButtonCustom("Delete");
-		JButtonCustom JButtonCustomFind = new JButtonCustom("Find");
-		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Update");
-		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Refresh");
-		JButtonCustom sort = new JButtonCustom("Sort By Name");
-		JButtonCustom buttonBack = new JButtonCustom("Back");
+		JButtonCustom JButtonCustomAdd = new JButtonCustom("Thêm");
+		JButtonCustom JButtonCustomDelete = new JButtonCustom("Xóa");
+		JButtonCustom JButtonCustomFind = new JButtonCustom("Tìm Kiếm");
+		JButtonCustom JButtonCustomUpdate = new JButtonCustom("Sửa");
+		JButtonCustom JButtonCustomRefresh = new JButtonCustom("Làm Mới");
+		JButtonCustom sort = new JButtonCustom("Sắp Xếp");
+		JButtonCustom buttonBack = new JButtonCustom("Thoát");
 		buttonBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new MenuDashBoards();
+				new Menu();
 			}
 		});
 
@@ -174,7 +178,7 @@ public class QuanLySinhVien extends JFrame {
 				sinhVien.setGender(comboBoxGender.getSelectedIndex() > 0 ? 0 : 1);
 				sinhVien.setDienthoai(tfPhone.getText());
 				sinhVien.setDiachi(tfDiachi.getText());
-				Lop lop = (Lop) jComboBox.getSelectedItem();
+				Lop lop = (Lop) lopComboBox.getSelectedItem();
 				sinhVien.setLop(lop);
 				if (tienXuLyDuLieu(sinhVien)) {
 					try {
@@ -206,18 +210,19 @@ public class QuanLySinhVien extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String[] columns = { "id", "Mã Sinh Viên", "Tên Sinh Viên", "Giới Tính", "Email", "Điện Thọai",
-						"Địa Chỉ", "id lớp" };
+						"Địa Chỉ", "lớp" };
 				defaultTableModel = new DefaultTableModel(columns, 0);
 				Vector<SinhVien> sinhviens;
 				Vector<Lop> lops = new Vector<>();
 				try {
 					sinhviens = sinhVienDao.findAll();
 					lops = sinhVienDao.getAllLop();
-					jComboBox = new JComboBox<Lop>(lops);
+					lopComboBox = new JComboBox<Lop>(lops);
 					for (SinhVien sinhVien : sinhviens) {
 						Object[] row = { sinhVien.getId(), sinhVien.getMasinhvien(), sinhVien.getTensinhvien(),
-								sinhVien.getGender() > 0 ? dataGioiTinh[0] : dataGioiTinh[1], sinhVien.getLop().getId(),
-								sinhVien.getEmail(), sinhVien.getDienthoai(), sinhVien.getDiachi() };
+								sinhVien.getGender() > 0 ? dataGioiTinh[0] : dataGioiTinh[1],
+								sinhVien.getLop().getTenlop(), sinhVien.getEmail(), sinhVien.getDienthoai(),
+								sinhVien.getDiachi() };
 						defaultTableModel.addRow(row);
 					}
 					table.setModel(defaultTableModel);
@@ -235,7 +240,7 @@ public class QuanLySinhVien extends JFrame {
 				// TODO Auto-generated method stub
 
 				sinhVien.setId(Integer.parseInt(tfId.getText()));
-				sinhVien.setLop((Lop) jComboBox.getSelectedItem());
+				sinhVien.setLop((Lop) lopComboBox.getSelectedItem());
 				sinhVien.setTensinhvien(tfname.getText());
 				sinhVien.setMasinhvien(tfmasv.getText());
 				sinhVien.setGender(comboBoxGender.getSelectedIndex() > 0 ? 0 : 1);
@@ -245,8 +250,8 @@ public class QuanLySinhVien extends JFrame {
 				if (tienXuLyDuLieu(sinhVien)) {
 					try {
 						ThongBao thongBao = sinhVienDao.update(sinhVien.getId(), sinhVien);
-
 						thongBaoTinNhan(thongBao);
+						layDuLieu();
 					} catch (Exception e2) {
 						e2.printStackTrace();
 					}
@@ -286,24 +291,18 @@ public class QuanLySinhVien extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				int row = table.getSelectedRow();
 				String id = (table.getModel().getValueAt(row, 0)).toString();
-				TableModel tableModel = table.getModel();
-				ComboBoxModel<Lop> comboBoxModel = jComboBox.getModel();
-				int idLop = (int) tableModel.getValueAt(row, 7);
-				Lop lop = timKiemLopById(idLop);
-				comboBoxModel.setSelectedItem(lop);
-				jComboBox.setModel(comboBoxModel);
-				try {
 
+				try {
 					SinhVien sinhVien = sinhVienDao.findOne(Integer.parseInt(id));
 					tfId.setText(sinhVien.getId() + "");
 					tfmasv.setText(sinhVien.getMasinhvien());
 					tfname.setText(sinhVien.getTensinhvien());
-
 					comboBoxGender.setSelectedItem(sinhVien.getGender() > 0 ? dataGioiTinh[0] : dataGioiTinh[1]);
-					;
 					tfEmail.setText(sinhVien.getEmail());
 					tfPhone.setText(sinhVien.getDienthoai());
 					tfDiachi.setText(sinhVien.getDiachi());
+					lopModel.setSelectedItem(sinhVien.getLop());
+					lopComboBox.setModel(lopModel);
 				} catch (Exception e2) {
 					e2.printStackTrace();
 					// TODO: handle exception
@@ -352,13 +351,13 @@ public class QuanLySinhVien extends JFrame {
 
 	public void layDuLieu(Vector<SinhVien> sinhViens) {
 		String[] columns = { "id", "Mã Sinh Viên", "Tên Sinh Viên", "Giới Tính", "Email", "Điện Thoại", "Địa Chỉ",
-				"id lớp" };
+				"Lớp" };
 		defaultTableModel = new DefaultTableModel(columns, 0);
-
+		lopModel = new DefaultComboBoxModel<>(lops);
 		for (SinhVien sinhVien : sinhviens) {
 			Object[] row = { sinhVien.getId(), sinhVien.getMasinhvien(), sinhVien.getTensinhvien(),
 					(sinhVien.getGender() > 0 ? dataGioiTinh[0] : dataGioiTinh[1]), sinhVien.getEmail(),
-					sinhVien.getDienthoai(), sinhVien.getDiachi(), sinhVien.getLop().getId() };
+					sinhVien.getDienthoai(), sinhVien.getDiachi(), sinhVien.getLop().getTenlop() };
 			defaultTableModel.addRow(row);
 		}
 		table.setModel(defaultTableModel);
@@ -368,24 +367,12 @@ public class QuanLySinhVien extends JFrame {
 
 		try {
 			lops = sinhVienDao.getAllLop();
-			jComboBox = new JComboBox<Lop>(lops);
 			sinhviens = sinhVienDao.findAll();
-
 			layDuLieu(sinhViens);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-	}
-
-	public Lop timKiemLopById(int id) {
-
-		for (Lop lop : lops) {
-			if (lop.getId() == id)
-				return lop;
-		}
-		return null;
 
 	}
 
